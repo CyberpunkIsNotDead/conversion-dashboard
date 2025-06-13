@@ -23,8 +23,12 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <button onClick={handleClick} disabled={processing}>
+    <div className="flex flex-col items-center justify-center h-screen">
+      <button
+        onClick={handleClick}
+        disabled={processing}
+        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+      >
         {processing ? "Processing..." : "Process CSV"}
       </button>
       <p>Click the button to process the CSV file</p>
