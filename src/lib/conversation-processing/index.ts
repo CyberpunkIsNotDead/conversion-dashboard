@@ -1,6 +1,6 @@
 import { parseCSVFile } from "./csv";
 import { MessageData } from "./csv/types";
-import { processDialog } from "./ai";
+import { ConversionMark, processDialog } from "./ai";
 
 function groupMessagesByConversationId(messages: MessageData[]) {
   const grouped: Record<string, MessageData[]> = {};
@@ -38,7 +38,9 @@ async function processConversations() {
 
     const responses = await processDialog(messages);
 
-    mappedResponses.push(...responses.map((response) => response.output_text));
+    mappedResponses.push(
+      ...responses.map((response) => JSON.stringify(response)),
+    );
   }
 
   return mappedResponses;
