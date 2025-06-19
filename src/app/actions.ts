@@ -4,8 +4,8 @@ import { processConversations } from "@/lib/conversation-processing";
 
 export async function processCsv() {
   try {
-    await processConversations();
-    return { success: true };
+    const results = await processConversations();
+    return { success: true, results };
   } catch (error) {
     console.error("Error processing CSV:", error);
     if (error instanceof Error) {

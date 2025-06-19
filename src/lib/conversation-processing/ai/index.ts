@@ -1,12 +1,12 @@
 import OpenAI from "openai";
 import { MappedMessageData } from "./types";
 import { MessageData } from "@/lib/conversation-processing/csv/types";
+import { INSTRUCTION_PROMPT } from "./prompts";
 
 const INPUT_LENGTH_LIMIT = 10000;
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-  logLevel: process.env.NODE_ENV === "development" ? "debug" : "info",
 });
 
 function mapDialog(dialog: MessageData[]) {
@@ -44,6 +44,7 @@ function createResponse(chunk: string) {
   return client.responses.create({
     model: "gpt-4o-mini",
     input: chunk,
+    instructions: INSTRUCTION_PROMPT,
   });
 }
 
@@ -51,10 +52,14 @@ async function processDialog(dialog: MessageData[]) {
   const mappedDialog = mapDialog(dialog);
   const chunks = chunkMappedDialogToStrings(mappedDialog);
 
+  const responses = [];
+
   for (const chunk of chunks) {
     const response = await createResponse(chunk);
-    console.log(response);
+    responses.push(response);
   }
+
+  return responses;
 }
 
 export { processDialog };

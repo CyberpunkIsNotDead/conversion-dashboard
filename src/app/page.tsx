@@ -7,12 +7,19 @@ export default function Home() {
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
 
+  const [results, setResults] = useState<string[]>([]);
+
   async function handleClick() {
     try {
       setProcessing(true);
       const result = await processCsv();
+
       if (!result.success) {
         console.error("CSV processing failed:", result.error);
+      }
+
+      if (result.results) {
+        setResults(result.results);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -34,6 +41,16 @@ export default function Home() {
       <p>Click the button to process the CSV file</p>
       {processing && <p>Processing...</p>}
       {done && <p>Done!</p>}
+      {results.length > 0 && (
+        <div>
+          <h2>Results:</h2>
+          <ul>
+            {results.map((result, index) => (
+              <li key={index}>{result}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

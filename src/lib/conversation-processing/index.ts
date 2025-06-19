@@ -1,5 +1,6 @@
 import { parseCSVFile } from "./csv";
 import { MessageData } from "./csv/types";
+import { processDialog } from "./ai";
 
 function groupMessagesByConversationId(messages: MessageData[]) {
   const grouped: Record<string, MessageData[]> = {};
@@ -26,15 +27,23 @@ async function processConversations() {
 
   const groupedByConversationId = groupMessagesByConversationId(messages);
 
-  console.log(
-    "First conversation:",
-    groupedByConversationId[Object.keys(groupedByConversationId)[0]],
-  );
-  console.log("Total messages:", messages.length);
-  console.log(
-    "Total conversations:",
-    Object.keys(groupedByConversationId).length,
-  );
+  const TenRandomConversations = Object.keys(groupedByConversationId)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 10);
+
+  let mappedResponses: string[] = [];
+
+  for (const conversationId of TenRandomConversations) {
+    const messages = groupedByConversationId[conversationId];
+
+    const responses = await processDialog(messages);
+
+    mappedResponses = responses.map((response) => response.output_text);
+
+    console.log(responses);
+  }
+
+  return mappedResponses;
 
   // TODO
   // 1. Process messages
