@@ -31,23 +31,17 @@ async function processConversations() {
     .sort(() => 0.5 - Math.random())
     .slice(0, 10);
 
-  let mappedResponses: string[] = [];
+  const mappedResponses: string[] = [];
 
   for (const conversationId of TenRandomConversations) {
     const messages = groupedByConversationId[conversationId];
 
     const responses = await processDialog(messages);
 
-    mappedResponses = responses.map((response) => response.output_text);
-
-    console.log(responses);
+    mappedResponses.push(...responses.map((response) => response.output_text));
   }
 
   return mappedResponses;
-
-  // TODO
-  // 1. Process messages
-  // 2. Save to database
 }
 
 export { processConversations };
