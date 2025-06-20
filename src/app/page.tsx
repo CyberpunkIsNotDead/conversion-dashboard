@@ -2,7 +2,49 @@
 
 import { useState } from "react";
 import { processCsv } from "@/app/actions";
-import { DialogInfo } from "@/lib/conversation-processing/ai/types";
+import type { DialogInfo } from "@/lib/conversation-processing/ai/types";
+import type { ConversionMark } from "@/lib/conversation-processing/ai/types";
+
+function ConversionMarkInfo({ mark }: { mark: ConversionMark }) {
+  return (
+    <div>
+      <p className="font-bold pl-8">{mark.conversion_mark}</p>
+      {mark.messages.map((message, index) => (
+        <div key={index}>
+          <p className="font-bold pl-16">{message.role}</p>
+          <p className="pl-24">{message.message}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DialogInfo({ dialog }: { dialog: DialogInfo }) {
+  return (
+    <li>
+      <p>Dialog ID: {dialog.dialog_id}</p>
+      <div className="flex flex-col gap-2">
+        {dialog.conversion_marks_info.map((mark, index) => (
+          <ConversionMarkInfo mark={mark} key={index} />
+        ))}
+      </div>
+    </li>
+  );
+}
+
+function PercentageInfo({
+  label,
+  percentage,
+}: {
+  label: string;
+  percentage: number;
+}) {
+  return (
+    <p>
+      {label}: {percentage}%
+    </p>
+  );
+}
 
 export default function Home() {
   const [processing, setProcessing] = useState(false);
@@ -13,6 +55,14 @@ export default function Home() {
   const [chooseSpecialistPercentage, setChooseSpecialistPercentage] =
     useState(0);
   const [madeAppointmentPercentage, setMadeAppointmentPercentage] = useState(0);
+
+  const percentages = [
+    { percentage: chooseServicePercentage, label: "Choose service" },
+    { percentage: chooseSpecialistPercentage, label: "Choose specialist" },
+    { percentage: madeAppointmentPercentage, label: "Made appointment" },
+  ];
+
+  const [error, setError] = useState<string | null>(null);
 
   async function handleClick() {
     try {
@@ -32,6 +82,8 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error:", error);
+
+      setError(error instanceof Error ? error.message : "Unknown error");
     } finally {
       setProcessing(false);
     }
@@ -39,6 +91,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center">
+      <p>
+        Click the button to process the CSV file. AI would process 10 random
+        conversations and return the conversion marks.
+      </p>
+
       <button
         onClick={handleClick}
         disabled={processing}
@@ -46,47 +103,29 @@ export default function Home() {
       >
         {processing ? "Processing..." : "Process CSV"}
       </button>
-      <p>Click the button to process the CSV file</p>
+
+      {percentages.map((percentage) => (
+        <PercentageInfo
+          label={percentage.label}
+          percentage={percentage.percentage}
+          key={percentage.label}
+        />
+      ))}
 
       {processing && <p>Processing...</p>}
 
-      {chooseServicePercentage > 0 && (
-        <p>Choose service percentage: {chooseServicePercentage}</p>
-      )}
-
-      {chooseSpecialistPercentage > 0 && (
-        <p>Choose specialist percentage: {chooseSpecialistPercentage}</p>
-      )}
-
-      {madeAppointmentPercentage > 0 && (
-        <p>Made appointment percentage: {madeAppointmentPercentage}</p>
-      )}
-
-      {dialogs.length > 0 && (
+      {!processing && dialogs.length > 0 && (
         <div>
           <h2>Dialogs:</h2>
           <ul>
             {dialogs.map((dialog, index) => (
-              <li key={index}>
-                <p>Dialog ID: {dialog.dialog_id}</p>
-                <div className="flex flex-col gap-2">
-                  {dialog.conversion_marks_info.map((mark, index) => (
-                    <div key={index}>
-                      <p className="font-bold pl-8">{mark.conversion_mark}</p>
-                      {mark.messages.map((message, index) => (
-                        <div key={index}>
-                          <p className="font-bold pl-16">{message.role}</p>
-                          <p className="pl-24">{message.message}</p>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </li>
+              <DialogInfo dialog={dialog} key={index} />
             ))}
           </ul>
         </div>
       )}
+
+      {error && <p className="text-red-500">Error: {error}</p>}
     </div>
   );
 }
