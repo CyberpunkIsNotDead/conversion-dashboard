@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { processCsv } from "@/app/actions";
-import type { DialogInfo } from "@/lib/ai/types";
+import type { DialogInfo as DialogInfoType } from "@/lib/ai/types";
 import type { ConversionMark } from "@/lib/ai/types";
 
 function ConversionMarkInfo({ mark }: { mark: ConversionMark }) {
@@ -19,7 +19,7 @@ function ConversionMarkInfo({ mark }: { mark: ConversionMark }) {
   );
 }
 
-function DialogInfo({ dialog }: { dialog: DialogInfo }) {
+function DialogInfo({ dialog }: { dialog: DialogInfoType }) {
   return (
     <li>
       <p>Dialog ID: {dialog.dialog_id}</p>
@@ -49,7 +49,7 @@ function PercentageInfo({
 export default function Home() {
   const [processing, setProcessing] = useState(false);
 
-  const [dialogs, setDialogs] = useState<DialogInfo[]>([]);
+  const [dialogs, setDialogs] = useState<DialogInfoType[]>([]);
 
   const [chooseServicePercentage, setChooseServicePercentage] = useState(0);
   const [chooseSpecialistPercentage, setChooseSpecialistPercentage] =
