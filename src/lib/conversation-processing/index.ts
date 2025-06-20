@@ -1,6 +1,7 @@
 import { parseCSVFile } from "./csv";
 import { MessageData } from "./csv/types";
-import { ConversionMark, processDialog } from "./ai";
+import { processDialog } from "./ai";
+import { DialogInfo } from "./ai/types";
 
 function groupMessagesByConversationId(messages: MessageData[]) {
   const grouped: Record<string, MessageData[]> = {};
@@ -31,19 +32,33 @@ async function processConversations() {
     .sort(() => 0.5 - Math.random())
     .slice(0, 10);
 
-  const mappedResponses: string[] = [];
+  const dialogs: DialogInfo[] = [];
 
   for (const conversationId of TenRandomConversations) {
     const messages = groupedByConversationId[conversationId];
 
-    const responses = await processDialog(messages);
+    const dialogInfo = await processDialog(conversationId, messages);
 
-    mappedResponses.push(
-      ...responses.map((response) => JSON.stringify(response)),
-    );
+    dialogs.push(dialogInfo);
   }
 
-  return mappedResponses;
+  return dialogs;
 }
 
-export { processConversations };
+function getConversionPercentage(
+  dialogs: DialogInfo[],
+  mark: "choose_service" | "choose_specialist" | "made_appointment",
+) {
+  const totalConversations = dialogs.length;
+  const totalConversionMarks = dialogs.reduce((acc, dialog) => {
+    if (dialog.conversion_marks_info.some((m) => m.conversion_mark === mark)) {
+      return acc + 1;
+    }
+
+    return acc;
+  }, 0);
+
+  return (totalConversionMarks / totalConversations) * 100;
+}
+
+export { processConversations, getConversionPercentage };

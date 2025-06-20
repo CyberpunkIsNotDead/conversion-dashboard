@@ -1,11 +1,33 @@
 "use server";
 
-import { processConversations } from "@/lib/conversation-processing";
+import {
+  processConversations,
+  getConversionPercentage,
+} from "@/lib/conversation-processing";
 
 export async function processCsv() {
   try {
-    const results = await processConversations();
-    return { success: true, results };
+    const dialogs = await processConversations();
+    const chooseServicePercentage = getConversionPercentage(
+      dialogs,
+      "choose_service",
+    );
+    const chooseSpecialistPercentage = getConversionPercentage(
+      dialogs,
+      "choose_specialist",
+    );
+    const madeAppointmentPercentage = getConversionPercentage(
+      dialogs,
+      "made_appointment",
+    );
+
+    return {
+      success: true,
+      dialogs,
+      chooseServicePercentage,
+      chooseSpecialistPercentage,
+      madeAppointmentPercentage,
+    };
   } catch (error) {
     console.error("Error processing CSV:", error);
     if (error instanceof Error) {

@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { processCsv } from "@/app/actions";
+import { DialogInfo } from "@/lib/conversation-processing/ai/types";
 
 export default function Home() {
   const [processing, setProcessing] = useState(false);
-  const [done, setDone] = useState(false);
 
-  const [results, setResults] = useState<string[]>([]);
+  const [dialogs, setDialogs] = useState<DialogInfo[]>([]);
+
+  const [chooseServicePercentage, setChooseServicePercentage] = useState(0);
+  const [chooseSpecialistPercentage, setChooseSpecialistPercentage] =
+    useState(0);
+  const [madeAppointmentPercentage, setMadeAppointmentPercentage] = useState(0);
 
   async function handleClick() {
     try {
@@ -18,14 +23,17 @@ export default function Home() {
         console.error("CSV processing failed:", result.error);
       }
 
-      if (result.results) {
-        setResults(result.results);
+      if (result.dialogs) {
+        setDialogs(result.dialogs);
+
+        setChooseServicePercentage(result.chooseServicePercentage);
+        setChooseSpecialistPercentage(result.chooseSpecialistPercentage);
+        setMadeAppointmentPercentage(result.madeAppointmentPercentage);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setProcessing(false);
-      setDone(true);
     }
   }
 
@@ -39,14 +47,42 @@ export default function Home() {
         {processing ? "Processing..." : "Process CSV"}
       </button>
       <p>Click the button to process the CSV file</p>
+
       {processing && <p>Processing...</p>}
-      {done && <p>Done!</p>}
-      {results.length > 0 && (
+
+      {chooseServicePercentage > 0 && (
+        <p>Choose service percentage: {chooseServicePercentage}</p>
+      )}
+
+      {chooseSpecialistPercentage > 0 && (
+        <p>Choose specialist percentage: {chooseSpecialistPercentage}</p>
+      )}
+
+      {madeAppointmentPercentage > 0 && (
+        <p>Made appointment percentage: {madeAppointmentPercentage}</p>
+      )}
+
+      {dialogs.length > 0 && (
         <div>
-          <h2>Results:</h2>
+          <h2>Dialogs:</h2>
           <ul>
-            {results.map((result, index) => (
-              <li key={index}>{result}</li>
+            {dialogs.map((dialog, index) => (
+              <li key={index}>
+                <p>Dialog ID: {dialog.dialog_id}</p>
+                <div className="flex flex-col gap-2">
+                  {dialog.conversion_marks_info.map((mark, index) => (
+                    <div key={index}>
+                      <p className="font-bold pl-8">{mark.conversion_mark}</p>
+                      {mark.messages.map((message, index) => (
+                        <div key={index}>
+                          <p className="font-bold pl-16">{message.role}</p>
+                          <p className="pl-24">{message.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </li>
             ))}
           </ul>
         </div>

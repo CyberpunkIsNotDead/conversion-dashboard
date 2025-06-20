@@ -1,37 +1,14 @@
 import OpenAI from "openai";
-import { MappedMessageData } from "./types";
+import {
+  AIResponse,
+  DialogInfo,
+  MappedMessageData,
+  ParsedResponseText,
+} from "./types";
 import { MessageData } from "@/lib/conversation-processing/csv/types";
 import { INSTRUCTION_PROMPT } from "./prompts";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
-
-// Define the type for our conversion marks info
-export type ConversionMark = {
-  conversion_mark: "choose_service" | "choose_specialist" | "made_appointment";
-  messages: {
-    role: "human" | "bot";
-    message: string;
-  }[];
-};
-
-// Type for the response text that includes our conversion marks info
-export type ParsedResponseText = {
-  conversion_marks_info: ConversionMark[];
-};
-
-// Type for the complete response
-export type AIResponse = OpenAI.Responses.Response & {
-  output: [
-    {
-      content: [
-        {
-          type: string;
-          text: string;
-        },
-      ];
-    },
-  ];
-};
 
 const INPUT_LENGTH_LIMIT = 10000;
 
@@ -100,38 +77,38 @@ function createResponse(chunk: string) {
   });
 }
 
-async function processDialog(dialog: MessageData[]) {
+async function processDialog(conversationId: string, dialog: MessageData[]) {
   const mappedDialog = mapDialog(dialog);
   const chunks = chunkMappedDialogToStrings(mappedDialog);
 
-  const conversionMarks: ConversionMark[][] = [];
+  const dialogInfo: DialogInfo = {
+    dialog_id: conversationId,
+    conversion_marks_info: [],
+  };
 
   for (const chunk of chunks) {
     const response = (await createResponse(chunk)) as AIResponse;
 
     if (response.status === "incomplete") {
       console.error(
-        "Incomplete: " +
-          (response.incomplete_details?.reason || "Unknown reason"),
+        `Incomplete: ${response.incomplete_details?.reason || "Unknown reason"}`,
       );
     }
 
     const responseContent = response.output[0].content[0];
 
     if (responseContent.type === "refusal") {
-      console.error("Refusal: " + response);
+      console.error(`Refusal: ${response}`);
     } else if (responseContent.type === "output_text") {
       const marks = ConversionMarksInfo.parse(
         JSON.parse(responseContent.text) as ParsedResponseText,
       );
 
-      console.log(marks);
-
-      conversionMarks.push(marks.conversion_marks_info);
+      dialogInfo.conversion_marks_info.push(...marks.conversion_marks_info);
     }
   }
 
-  return conversionMarks;
+  return dialogInfo;
 }
 
 export { processDialog };
