@@ -1,7 +1,7 @@
-import { parseCSVFile } from "./csv";
-import { MessageData } from "./csv/types";
-import { processDialog } from "./ai";
-import { DialogInfo } from "./ai/types";
+import { MessageData } from "@/lib/csv/types";
+import { DialogInfo } from "@/lib/ai/types";
+import { parseCSVFile } from "@/lib/csv";
+import { processDialog } from "@/lib/ai";
 
 function groupMessagesByConversationId(messages: MessageData[]) {
   const grouped: Record<string, MessageData[]> = {};

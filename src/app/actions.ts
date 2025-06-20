@@ -3,7 +3,7 @@
 import {
   processConversations,
   getConversionPercentage,
-} from "@/lib/conversation-processing";
+} from "@/features/conversationProcessing";
 
 export async function processCsv() {
   try {

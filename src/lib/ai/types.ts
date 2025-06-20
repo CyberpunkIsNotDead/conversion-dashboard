@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { MessageData } from "@/lib/conversation-processing/csv/types";
+import { MessageData } from "@/lib/csv/types";
 
 type MappedMessageData = Pick<MessageData, "role" | "message">;
 

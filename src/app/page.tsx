@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { processCsv } from "@/app/actions";
-import type { DialogInfo } from "@/lib/conversation-processing/ai/types";
-import type { ConversionMark } from "@/lib/conversation-processing/ai/types";
+import type { DialogInfo } from "@/lib/ai/types";
+import type { ConversionMark } from "@/lib/ai/types";
 
 function ConversionMarkInfo({ mark }: { mark: ConversionMark }) {
   return (

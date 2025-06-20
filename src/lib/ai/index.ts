@@ -5,7 +5,7 @@ import {
   MappedMessageData,
   ParsedResponseText,
 } from "./types";
-import { MessageData } from "@/lib/conversation-processing/csv/types";
+import { MessageData } from "@/lib/csv/types";
 import { INSTRUCTION_PROMPT } from "./prompts";
 import { z } from "zod";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
