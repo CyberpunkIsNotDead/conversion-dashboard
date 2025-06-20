@@ -1,14 +1,16 @@
 import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod.mjs";
+import { z } from "zod";
+
+import { MessageData } from "@/shared/types";
+
 import {
   AIResponse,
   DialogInfo,
   MappedMessageData,
   ParsedResponseText,
 } from "./types";
-import { MessageData } from "@/lib/csv/types";
 import { INSTRUCTION_PROMPT } from "./prompts";
-import { z } from "zod";
-import { zodTextFormat } from "openai/helpers/zod.mjs";
 
 const INPUT_LENGTH_LIMIT = 10000;
 

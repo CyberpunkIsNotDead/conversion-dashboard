@@ -1,7 +1,8 @@
-import { MessageData } from "./types";
 import { Readable } from "stream";
 import { parse } from "fast-csv";
 import fs from "fs";
+
+import { MessageData } from "@/shared/types";
 
 /**
  * Parse a large CSV file into MessageData objects

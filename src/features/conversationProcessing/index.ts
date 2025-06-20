@@ -1,4 +1,4 @@
-import { MessageData } from "@/lib/csv/types";
+import { MessageData } from "@/shared/types";
 import { DialogInfo } from "@/lib/ai/types";
 import { parseCSVFile } from "@/lib/csv";
 import { processDialog } from "@/lib/ai";

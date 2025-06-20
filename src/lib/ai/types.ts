@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { MessageData } from "@/lib/csv/types";
+import { MessageData } from "@/shared/types";
 
 type MappedMessageData = Pick<MessageData, "role" | "message">;
 
